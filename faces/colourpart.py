@@ -1,8 +1,9 @@
-from bodypart import BodyPart
+from . import bodypart
+#from bodypart import bodypart.BodyPart
 from PIL import Image
 
 
-class ColourPart(BodyPart):
+class ColourPart(bodypart.BodyPart):
     R_OLD, G_OLD, B_OLD = 0, 255, 0
 
     def __init__(self, group='16', part='mouth', dna_code='1', colour=(0, 0, 0), picfile=None):

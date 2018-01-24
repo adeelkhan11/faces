@@ -1,5 +1,7 @@
-from bodypart import BodyPart
-from colourpart import ColourPart
+from . import bodypart
+#from bodypart import bodypart.BodyPart
+#from colourpart import colourpart.ColourPart
+from . import colourpart
 from PIL import Image
 import random
 
@@ -46,23 +48,23 @@ class Face:
         # glasses colour
         gender, head, eye, eye_colour, mouth, beard, hair, hair_colour, glasses, glasses_colour = self.dna.split('-')
 
-        BodyPart(group=self.group, part='head', dna_code=head).draw(canvas, location)
-        ColourPart(group=self.group, part='eye', dna_code=eye, colour=self.EYE_COLOURS[int(eye_colour)]).draw(canvas, location)
-        BodyPart(group=self.group, part='mouth', dna_code=mouth).draw(canvas, location)
-        ColourPart(group=self.group, part='beard', dna_code=beard, colour=self.HAIR_COLOURS[int(hair_colour)]).draw(canvas, location)
-        ColourPart(group=self.group, part='hair', dna_code=hair, colour=self.HAIR_COLOURS[int(hair_colour)]).draw(canvas, location)
-        ColourPart(group=self.group, part='glasses', dna_code=glasses, colour=self.GLASSES_COLOURS[int(glasses_colour)]).draw(canvas, location)
+        bodypart.BodyPart(group=self.group, part='head', dna_code=head).draw(canvas, location)
+        colourpart.ColourPart(group=self.group, part='eye', dna_code=eye, colour=self.EYE_COLOURS[int(eye_colour)]).draw(canvas, location)
+        bodypart.BodyPart(group=self.group, part='mouth', dna_code=mouth).draw(canvas, location)
+        colourpart.ColourPart(group=self.group, part='beard', dna_code=beard, colour=self.HAIR_COLOURS[int(hair_colour)]).draw(canvas, location)
+        colourpart.ColourPart(group=self.group, part='hair', dna_code=hair, colour=self.HAIR_COLOURS[int(hair_colour)]).draw(canvas, location)
+        colourpart.ColourPart(group=self.group, part='glasses', dna_code=glasses, colour=self.GLASSES_COLOURS[int(glasses_colour)]).draw(canvas, location)
 
     @classmethod
     def randomFace(cls, group):
         gender = random.choice('mf')
-        head = random.choice(BodyPart.allDnaCodes(group, 'head', gender=gender))
-        eye = random.choice(BodyPart.allDnaCodes(group, 'eye'))
-        mouth = random.choice(BodyPart.allDnaCodes(group, 'mouth', gender=gender))
-        beard = random.choice(BodyPart.allDnaCodes(group, 'beard', gender=gender))
-        hair = random.choice(BodyPart.allDnaCodes(group, 'hair', gender=gender))
+        head = random.choice(bodypart.BodyPart.allDnaCodes(group, 'head', gender=gender))
+        eye = random.choice(bodypart.BodyPart.allDnaCodes(group, 'eye'))
+        mouth = random.choice(bodypart.BodyPart.allDnaCodes(group, 'mouth', gender=gender))
+        beard = random.choice(bodypart.BodyPart.allDnaCodes(group, 'beard', gender=gender))
+        hair = random.choice(bodypart.BodyPart.allDnaCodes(group, 'hair', gender=gender))
         hair_colour = str(random.randint(0, 3))
-        glasses = random.choice(BodyPart.allDnaCodes(group, 'glasses', gender=gender))
+        glasses = random.choice(bodypart.BodyPart.allDnaCodes(group, 'glasses', gender=gender))
         eye_colour = str(random.randint(0, 3))
         glasses_colour = str(random.randint(0, 3))
         dna = '-'.join([gender, head, eye, eye_colour, mouth, beard, hair, hair_colour, glasses, glasses_colour])
@@ -71,12 +73,12 @@ class Face:
 
     @classmethod
     def allFaces(cls, group, gender):
-        heads = BodyPart.allDnaCodes(group, 'head', gender=gender)
-        eyes = BodyPart.allDnaCodes(group, 'eye')
-        mouths = BodyPart.allDnaCodes(group, 'mouth', gender=gender)
-        beards = BodyPart.allDnaCodes(group, 'beard', gender=gender)
-        hairs = BodyPart.allDnaCodes(group, 'hair', gender=gender)
-        glasseses = BodyPart.allDnaCodes(group, 'glasses', gender=gender)
+        heads = bodypart.BodyPart.allDnaCodes(group, 'head', gender=gender)
+        eyes = bodypart.BodyPart.allDnaCodes(group, 'eye')
+        mouths = bodypart.BodyPart.allDnaCodes(group, 'mouth', gender=gender)
+        beards = bodypart.BodyPart.allDnaCodes(group, 'beard', gender=gender)
+        hairs = bodypart.BodyPart.allDnaCodes(group, 'hair', gender=gender)
+        glasseses = bodypart.BodyPart.allDnaCodes(group, 'glasses', gender=gender)
         hair_colours = [str(i) for i in range(len(cls.HAIR_COLOURS))]
 
         result = list()
@@ -91,30 +93,27 @@ class Face:
                                     glasses_colour = str(random.randint(0, len(cls.GLASSES_COLOURS) - 1))
                                     result.append(Face.makeDna(gender, head, eye, eye_colour, mouth, beard, hair, hair_colour, glasses, glasses_colour))
 
+        print(result)
         return result
 
+    @classmethod
+    def fillRandomGrid(cls, group='32', grid_width=5, grid_height=5, horizontal_spacing=40, vertical_spacing=40):
+        male_faces = Face.allFaces(group, 'm')
+        female_faces = Face.allFaces(group, 'f')
+        faces = male_faces + female_faces
+        random.shuffle(faces)
+        print("{} male faces and {} female faces.".format(len(male_faces), len(female_faces)))
+        width, height = horizontal_spacing * grid_width, vertical_spacing * grid_height
+        canvas = Image.new("RGBA", (width, height))
+        for i in range(grid_width):
+            for j in range(grid_height):
+                # face = Face.randomFace('16')
+                face = cls(group, faces[j * grid_width + i])
+                face.draw(canvas, ((i * horizontal_spacing) + 4, (j * vertical_spacing) + 4))
+        new_width, new_height = width * 4, height * 4
+        resized_canvas = canvas.resize((new_width, new_height))
 
-grid_width, grid_height = 6, 8
-group = '32'
-face_spacing = 40
-print('Hello World!')
+        canvas.save('faces/images/output/output_{}_{}x{}.png'.format(group, grid_width, grid_height))
+        resized_canvas.save('faces/images/output/output_{}_{}x{}-large.png'.format(group, grid_width, grid_height))
 
-mfaces = Face.allFaces(group, 'm')
-ffaces = Face.allFaces(group, 'f')
-faces = mfaces + ffaces
-random.shuffle(faces)
-print("{} male faces and {} female faces.".format(len(mfaces), len(ffaces)))
-width, height = face_spacing * grid_width, face_spacing * grid_height
-canvas = Image.new("RGBA", (width, height))
-for i in range(grid_width):
-    for j in range(grid_height):
-        #face = Face.randomFace('16')
-        face = Face(group, faces[j * grid_width + i])
-        face.draw(canvas, ((i*face_spacing) + 4, (j*face_spacing) + 4))
-new_width, new_height = width * 4, height * 4
-picr = canvas.resize((new_width, new_height))
 
-canvas.save('images/output/output.png')
-picr.save('images/output/output-large.png')
-#picr = picr.convert('RGB')
-#picr.save('images/output/output-large.jpg', quality=95, optimize=True)

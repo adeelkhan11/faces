@@ -7,7 +7,7 @@ import re
 class BodyPart:
     def __init__(self, group='16', part='head', dna_code='01', picfile=None):
         if picfile is None:
-            self.picfile = 'images/{}/{}-{}.png'.format(group, part, dna_code)
+            self.picfile = 'faces/images/{}/{}-{}.png'.format(group, part, dna_code)
         else:
             self.picfile = picfile
         self.position = (0, 0)
@@ -31,7 +31,7 @@ class BodyPart:
     def allTypes(cls, group, part, gender=''):
         result = list()
 
-        for f in glob.glob('images/{}/{}-{}*.png'.format(group, part, gender)):
+        for f in glob.glob('faces/images/{}/{}-{}*.png'.format(group, part, gender)):
             #print(f)
             result.append(cls(picfile=f))
 
@@ -41,9 +41,12 @@ class BodyPart:
     def allDnaCodes(cls, group, part, gender=''):
         result = list()
 
-        for f in glob.glob('images/{}/{}-{}*.png'.format(group, part, gender)):
-            #print('images/{}/{}-({}.+)\.png'.format(group, part, gender))
-            m = re.search('images/{}/{}-({}.+)\.png'.format(group, part, gender), f)
+        print('faces/images/{}/{}-{}*.png'.format(group, part, gender))
+        print(glob.glob('faces/images/*'))
+
+        for f in glob.glob('faces/images/{}/{}-{}*.png'.format(group, part, gender)):
+            #print('faces/images/{}/{}-({}.+)\.png'.format(group, part, gender))
+            m = re.search('faces/images/{}/{}-({}.+)\.png'.format(group, part, gender), f)
             #if m:
             #print(m.group(1))
             result.append(m.group(1))
