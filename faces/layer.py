@@ -4,28 +4,22 @@ import glob
 import re
 
 
-class BodyPart:
-    def __init__(self, group='16', part='head', dna_code='01', picfile=None):
-        if picfile is None:
-            self.picfile = 'faces/images/{}/{}-{}.png'.format(group, part, dna_code)
-        else:
-            self.picfile = picfile
-        self.position = (0, 0)
+class Layer:
+    def __init__(self, group='16', part='head', genders=['']):
+        self.group = group
+        self.part = part
+        self.dna_codes = list()
+        self.is_gender_specific = True if len(genders) > 1 else False
+        for gender in genders:
+            self.dna_codes.extend(Layer.allDnaCodes(self.group, self.part, gender))
 
-    @property
-    def picfile(self):
-        return self._picfile
+        self.images = dict()
+        for dna_code in self.dna_codes:
+            picfile = 'faces/images/{}/{}-{}.png'.format(group, part, dna_code)
+            self.images[dna_code] = Image.open(picfile)
 
-    @picfile.setter
-    def picfile(self, value):
-        if os.path.isfile(value):
-            self._picfile = value
-        else:
-            raise ValueError('Image file {} does not exist.'.format(value))
-
-    def draw(self, canvas, location=(0,0)):
-        image = Image.open(self.picfile)
-        canvas.paste(image, location, mask=image)
+    def draw(self, canvas, dna_code, location=(0,0)):
+        canvas.paste(self.images[dna_code], location, mask=self.images[dna_code])
 
     @classmethod
     def allTypes(cls, group, part, gender=''):

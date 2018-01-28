@@ -93,7 +93,6 @@ class Face:
                                     glasses_colour = str(random.randint(0, len(cls.GLASSES_COLOURS) - 1))
                                     result.append(Face.makeDna(gender, head, eye, eye_colour, mouth, beard, hair, hair_colour, glasses, glasses_colour))
 
-        print(result)
         return result
 
     @classmethod
@@ -108,8 +107,10 @@ class Face:
         for i in range(grid_width):
             for j in range(grid_height):
                 # face = Face.randomFace('16')
-                face = cls(group, faces[j * grid_width + i])
-                face.draw(canvas, ((i * horizontal_spacing) + 4, (j * vertical_spacing) + 4))
+                face_index = j * grid_width + i
+                if face_index < len(faces):
+                    face = cls(group, faces[face_index])
+                    face.draw(canvas, ((i * horizontal_spacing) + 4, (j * vertical_spacing) + 4))
         new_width, new_height = width * 4, height * 4
         resized_canvas = canvas.resize((new_width, new_height))
 
